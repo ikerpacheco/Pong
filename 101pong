@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+import sys
+from typing import Any
+import numpy
+
+def usage():
+    print("USAGE")
+    print("    ./101pong x0 y0 z0 x1 y1 z1 n\n")
+    print("DESCRIPTION")
+    print("    x0  ball abscissa at time t - 1")
+    print("    y0  ball ordinate at time t - 1")
+    print("    z0  ball altitude at time t - 1")
+    print("    x1  ball abscissa at time t")
+    print("    y1  ball ordinate at time t")
+    print("    z1  ball altitude at time t")
+    print("    n  time shift (greater than or equal to zero, integer)")
+
+def error_handling(argv):
+    i = 1
+
+    if len(argv) == 1:
+        exit(84)
+    if str(argv[1]) == '-h':
+        usage()
+    elif len(argv) != 8:
+        exit(84)
+    while i < 8:
+        try:
+            nb = float(argv[i])
+        except:
+            exit(84)
+        i += 1
+    if float(argv[7]) <= 0:
+        exit(84)
+
+error_handling(sys.argv)
+
+def usage(argv):
+    if str(argv[1]) == "-h":
+        print("USAGE")
+        print("    ./101pong x0 y0 z0 x1 y1 z1 n\n")
+        print("DESCRIPTION")
+        print("    x0  ball abscissa at time t - 1")
+        print("    y0  ball ordinate at time t - 1")
+        print("    z0  ball altitude at time t - 1")
+        print("    x1  ball abscissa at time t")
+        print("    y1  ball ordinate at time t")
+        print("    z1  ball altitude at time t")
+        print("    n  time shift (greater than or equal to zero, integer)")
+
+usage(sys.argv)
+
+def velocity_vector(argv):
+    vector_x = float(argv[4]) - float(argv[1])
+    vector_y = float(argv[5]) - float(argv[2])
+    vector_z = float(argv[6]) - float(argv[3])
+    vector_total = (format(vector_x, ".2f"), format(vector_y, ".2f"), 
+    format(vector_z, ".2f"))
+    return vector_total
+
+vector = velocity_vector(sys.argv)
+
+def coordinates(argv, vector):
+    t = 1;
+    x = float(argv[1]) + float(vector[0]) * (float(argv[7]) + float(t))
+    y = float(argv[2]) + float(vector[1]) * (float(argv[7]) + float(t))
+    z = float(argv[3]) + float(vector[2]) * (float(argv[7]) + float(t))
+
+    vector_coordinates = (format(x, ".2f"), format(y, ".2f"),
+    format(z, ".2f"))
+    return vector_coordinates
+
+coordenadas = coordinates(sys.argv, vector)
+
+def get_angle(vector):
+    hypotenuse = numpy.sqrt(float(vector[0])**2 + float(vector[1])**2 + float(vector[2])**2)
+    if hypotenuse == 0:
+        exit(84)
+    angle = numpy.arcsin(float(vector[2]) / -hypotenuse)
+    angle = 180 * angle / 3.1415926535
+    return angle
+
+angle = get_angle(vector)
+
+print("The velocity vector of the ball is:")
+print("(", vector[0], ", ", vector[1], ", ", vector[2], ")", sep="")
+
+print("At time t +", sys.argv[7] + ", ball coordinates will be: ")
+print("(", coordenadas[0], ", ", coordenadas[1], ", ", coordenadas[2], ")", sep="")
+
+def hit_paddle(argv, angle, vector):
+    if float(argv[6]) < 0 and float(vector[2]) > 0 or float(argv[6]) > 0 and float(vector[2]) < 0:
+        print("The incidence angle is:")
+        if float(angle) < 0:    
+            print(format(-angle, ".2f"), "degrees")
+        else:
+            print(format(angle, ".2f"), "degrees")
+    else:
+        print("The ball won't reach the paddle.")
+
+hit_paddle(sys.argv, angle, vector)
